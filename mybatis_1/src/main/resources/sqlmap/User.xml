@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace：命名空间，用于隔离sql，还有一个很重要的作用，后面会讲 -->
+<mapper namespace="mapper.UserMapper">
+    <select id="findUserById" parameterType="Integer" resultType="User">
+      SELECT * FROM user WHERE id = #{v}
+    </select>
+ <!--
+    #{} 占位符 ？ == '五'
+    ${} 字符串拼接
+    -->
+    <select id="findUserByUsername" parameterType="String"  resultType="mybaits.po.User">
+       /* SELECT * FROM user WHERE username LIKE '%${value}%'*/
+        SELECT * FROM user WHERE username LIKE "%"#{haha}"%"
+    </select>
+    
+    <!--添加用户-->
+    <insert id="insertUser" parameterType="mybaits.po.User">
+        <selectKey keyProperty="id" resultType="Integer" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO user (username,birthday,address,sex) VALUES (#{username},#{birthday},#{address},#{sex})
+    </insert>
+    <!--修改用户-->
+    <update id="updateUserById" parameterType="mybaits.po.User">
+        UPDATE user
+        SET username = #{username},sex = #{sex},address = #{address},birthday = #{birthday}
+        WHERE id = #{id}
+    </update>
+
+    <!--删除用户-->
+    <delete id="deleteUserById" parameterType="Integer">
+        DELETE FROM user where id = #{idaaa}
+    </delete>
+</mapper>

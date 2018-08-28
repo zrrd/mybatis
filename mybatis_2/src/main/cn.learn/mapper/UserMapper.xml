@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace：命名空间，用于隔离sql -->
+<mapper namespace="mapper.UserMapper">
+    <select id="findUserById" parameterType="Integer" resultType="User">
+      SELECT * FROM user WHERE id = #{v}
+    </select>
+ <!--
+    #{} 占位符 ？ == '五'
+    ${} 字符串拼接
+    -->
+    <select id="findUserByUsername" parameterType="String"  resultType="mybaits.po.User">
+       /* SELECT * FROM user WHERE username LIKE '%${value}%'*/
+        SELECT * FROM user WHERE username LIKE "%"#{haha}"%"
+    </select>
+    
+    <!--添加用户-->
+    <insert id="insertUser" parameterType="mybaits.po.User">
+        <selectKey keyProperty="id" resultType="Integer" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO user (username,birthday,address,sex) VALUES (#{username},#{birthday},#{address},#{sex})
+    </insert>
+    <!--修改用户-->
+    <update id="updateUserById" parameterType="mybaits.po.User">
+        UPDATE user
+        SET username = #{username},sex = #{sex},address = #{address},birthday = #{birthday}
+        WHERE id = #{id}
+    </update>
+
+    <!--删除用户-->
+    <delete id="deleteUserById" parameterType="Integer">
+        DELETE FROM user where id = #{idaaa}
+    </delete>
+
+    <!--根据用户名模糊查询-->
+    <select id="findUserByQueryVo" parameterType="mybaits.vo.QueryVo" resultType="mybaits.vo.QueryVo">
+        SELECT * FROM user WHERE username like "%"#{user.username}"#"
+    </select>
+
+    <select id="countUser" resultType="Integer">
+         SELECT COUNT(1) FROM user
+    </select>
+    <!--根据性别和名称查询用户-->
+    <select id="selectUserBySexAndUsername" resultType="User" parameterType="User">
+        SELECT * FROM user
+        <where>
+            <if test="sex != null and sex != ''">
+                AND sex = #{sex}
+            </if>
+            <if test="username != null and username != ''">
+                AND username = #{username}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectUserByIds"  resultType="User">
+        SELECT * FROM user WHERE
+        <foreach collection="list" item="id" separator="," open="id in (" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <resultMap id="users" type="User">
+        <id column="user_id" property="id"></id>
+        <result column="username" property="username"></result>
+        <collection property="ordersList" ofType="Orders">
+            <id property="id" column="o.id"></id>
+            <result property="number" column="o.number"></result>
+        </collection>
+    </resultMap>
+<!--    一对多关联查询
+    List<User> getUsersOrder();-->
+    <select id="getOrdersList" resultMap="users">
+        SELECT o.id,o.user_id,o.number,o.createtime,u.username
+        FROM `user` u LEFT JOIN orders o ON o.user_id = u.id
+    </select>
+
+
+</mapper>
